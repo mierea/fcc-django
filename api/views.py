@@ -1,13 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import datetime
-import time
-# Create your views here.
+
+
+
 
 
 def api_list(request):
     return HttpResponse('test')
 
+# Timestamp Microservice
 def timestamp(request):
     return render(request, 'api/timestamp.html',  {})
 
@@ -23,3 +25,14 @@ def day_string(request, uyear, umonth, uday):
     date_number = datetime.datetime.strptime(s, "%d/%m/%Y").timestamp()
     return utc_string(request, date_number)
 
+# Request header parser
+def header_parser(request):
+    return render(request, 'api/request_header_parser.html', {})
+
+def whoami(request):
+    # print (request.headers.keys())
+    return JsonResponse({
+        "ipaddress": request.META['REMOTE_ADDR'],
+        "language": request.headers['Accept-Language'],
+        "software": request.headers['User-Agent'],
+    })
