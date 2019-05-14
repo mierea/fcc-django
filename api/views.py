@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 import datetime
-
+from .forms import ShorturlForm
 
 
 
@@ -36,3 +36,21 @@ def whoami(request):
         "language": request.headers['Accept-Language'],
         "software": request.headers['User-Agent'],
     })
+
+# URL Shortener Microservice
+def shorturl(request):
+    return render(request, 'api/shorturl.html', {'form': ShorturlForm() })
+
+def shorturl_redirect(request, pk):
+    return render(request, 'api/shorturl.html', {})
+
+def shorturl_new(request):
+    if  request.method == "POST":
+        form = ShorturlForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.original_url = request.original_url
+            post.save()
+            return JsonResponse({"original_url": post.original_url, "short_url": post.pk})
+    form = ShorturlForm()
+    return render(request, 'api/shorturl.html', {'form': form})
