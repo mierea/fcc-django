@@ -7,3 +7,6 @@ class ShorturlForm(forms.ModelForm):
         model = Shorturl
         fields = ('original_url',)
 
+
+class MetadataForm(forms.Form):
+    file = forms.FileField()

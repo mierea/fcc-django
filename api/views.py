@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import datetime
-from .forms import ShorturlForm
+from .forms import ShorturlForm, MetadataForm
 from .models import Shorturl
-
+import os
 
 
 def api_list(request):
@@ -60,3 +60,17 @@ def shorturl_new(request):
     form = ShorturlForm()
     return render(request, 'api/shorturl.html', {'form': form})
 
+# File Metadata Microservice
+def file_metadata(request):
+    if request.method == "POST":
+        form = MetadataForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            return JsonResponse({
+                "name": request.FILES['file'].name.split(".")[0],
+                "type": request.FILES['file'].name.split(".")[1].lower(),
+                "size": request.FILES['file'].size,
+            })
+
+    form = MetadataForm()
+    return render(request, 'api/metadata.html', {"form": form})

@@ -12,4 +12,5 @@ urlpatterns = [
     path('shorturl/', views.shorturl, name='shorturl'),
     path('shorturl/new', views.shorturl_new, name='shorturl_new'),
     path('shorturl/<int:pk>', views.shorturl_redirect, name='shorturl_redirect'),
+    path('metadata/', views.file_metadata, name='file_metadata'),
 ]
