@@ -1,8 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import datetime
 from .forms import ShorturlForm
-
+from .models import Shorturl
 
 
 
@@ -42,15 +42,21 @@ def shorturl(request):
     return render(request, 'api/shorturl.html', {'form': ShorturlForm() })
 
 def shorturl_redirect(request, pk):
-    return render(request, 'api/shorturl.html', {})
+    try:
+        url = Shorturl.objects.get(pk=pk)
+    except Shorturl.DoesNotExist:
+        form = ShorturlForm()
+        return render(request, 'api/shorturl.html', {'form': form, 'error': 'URL does not exist'})
+    return redirect(url.original_url)
 
 def shorturl_new(request):
     if  request.method == "POST":
         form = ShorturlForm(request.POST)
         if form.is_valid():
             post = form.save(commit=False)
-            post.original_url = request.original_url
+            post.original_url = request.POST['original_url']
             post.save()
             return JsonResponse({"original_url": post.original_url, "short_url": post.pk})
     form = ShorturlForm()
     return render(request, 'api/shorturl.html', {'form': form})
+

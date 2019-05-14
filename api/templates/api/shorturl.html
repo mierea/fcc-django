@@ -28,6 +28,7 @@
           example: <code>POST [project_url]/api/shorturl/new</code> - <code>https://www.google.com</code>
         </p>
         <form action="new" method="POST">{% csrf_token %}
+            <label>{{ error }}</label>
           {{ form.as_p }}
           <input type="submit" value="POST URL">
         </form>
