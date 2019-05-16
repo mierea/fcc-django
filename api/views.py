@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
+from django.db import IntegrityError
+
 import datetime
-from .forms import ShorturlForm, MetadataForm
-from .models import Shorturl
+from .forms import ShorturlForm, MetadataForm,ExerciseUserForm, ExerciseForm
+from .models import Shorturl, User
 import os
 
 
@@ -74,3 +76,64 @@ def file_metadata(request):
 
     form = MetadataForm()
     return render(request, 'api/metadata.html', {"form": form})
+
+
+# Exercise Tracker Microservice
+def exercise(request):
+    context = {'form_user': ExerciseUserForm(), 'form_exercise': ExerciseForm()}
+    return render(request, 'api/exercise.html', context)
+
+
+def exercise_new_user(request):
+    # Path `username` is required.
+    # username already taken
+    if request.method == "POST":
+        form = ExerciseUserForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+
+            post.username = request.POST['username']
+            post.save()
+            return JsonResponse({
+                "username": post.username,
+                "_id": post.pk
+            })
+        else:
+            return JsonResponse({"error": form.errors})
+
+
+    context = {'form_user': ExerciseUserForm(), 'form_exercise': ExerciseForm()}
+    return render(request, 'api/exercise.html', context)
+
+
+def exercise_add(request):
+    if request.method == "POST":
+        form = ExerciseForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+
+            post.user = User.objects.get(pk=request.POST['user'])
+
+            post.description = request.POST['description']
+            post.duration = request.POST['duration']
+            post.date = request.POST['date']
+
+            post.save()
+            return JsonResponse({
+                "userid": post.user.pk,
+                "username": post.user.username,
+                "description": post.description,
+                "duration": post.duration,
+                "date": post.date,
+
+            })
+        else:
+            return JsonResponse({"error": form.errors})
+
+
+    context = {'form_user': ExerciseUserForm(), 'form_exercise': ExerciseForm()}
+    return render(request, 'api/exercise.html', context)
+
+def exercise_log(request):
+    context = {'form_user': ExerciseUserForm(), 'form_exercise': ExerciseForm()}
+    return render(request, 'api/exercise.html', context)

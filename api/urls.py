@@ -13,4 +13,8 @@ urlpatterns = [
     path('shorturl/new', views.shorturl_new, name='shorturl_new'),
     path('shorturl/<int:pk>', views.shorturl_redirect, name='shorturl_redirect'),
     path('metadata/', views.file_metadata, name='file_metadata'),
+    path('exercise/', views.exercise, name='exercise'),
+    path('exercise/new-user', views.exercise_new_user, name='exercise_new_user'),
+    path('exercise/add', views.exercise_add, name='exercise_add'),
+    path('exercise/log', views.exercise_log, name='exercise_log'),
 ]
