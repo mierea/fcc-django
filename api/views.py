@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.db import IntegrityError
-
 import datetime
 from .forms import ShorturlForm, MetadataForm,ExerciseUserForm, ExerciseForm
-from .models import Shorturl, User
-import os
+from .models import Shorturl, User, Exercise
+from django.core import serializers
+from django.utils.dateparse import parse_date
+
 
 
 def api_list(request):
@@ -135,5 +136,31 @@ def exercise_add(request):
     return render(request, 'api/exercise.html', context)
 
 def exercise_log(request):
+    userid = next(iter(request.GET.dict()))
+    print(userid)
+    if userid != None:
+        get_from = request.GET.get('from', None)
+        if get_from is not None:
+            get_from = parse_date(get_from)
+
+        get_to = request.GET.get('to', None)
+        if get_to is not None:
+            get_to = parse_date(get_to)
+
+        get_limit = request.GET.get('limit', None)
+        if get_limit is not None and get_limit.isnumeric():
+            get_limit = int(get_limit)
+
+        if get_from is not None and get_to is not None:
+            exercise_list = serializers.serialize('python', Exercise.objects.filter(user=userid, date__range=[get_from, get_to]))
+        elif get_from is not None:
+            exercise_list = serializers.serialize('python', Exercise.objects.filter(user=userid, date__gte=get_from))
+        elif get_to is not None:
+            exercise_list = serializers.serialize('python', Exercise.objects.filter(user=userid, date__lte=get_to))
+        else:
+            exercise_list = serializers.serialize('python', Exercise.objects.filter(user=userid))
+
+        return JsonResponse({"exercises": exercise_list[:get_limit]})
+
     context = {'form_user': ExerciseUserForm(), 'form_exercise': ExerciseForm()}
     return render(request, 'api/exercise.html', context)

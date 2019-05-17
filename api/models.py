@@ -14,3 +14,4 @@ class Exercise(models.Model):
     description = models.CharField(max_length=200, null=False)
     duration = models.IntegerField(null=False)
     date = models.DateField(default=timezone.now, null=False)
+
