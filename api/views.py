@@ -10,7 +10,7 @@ from django.utils.dateparse import parse_date
 
 
 def api_list(request):
-    return HttpResponse('test')
+    return render(request, 'api/list.html', {})
 
 # Timestamp Microservice
 def timestamp(request):
